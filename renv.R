@@ -1,3 +1,5 @@
+# this file loads all the packages and initialises the environment
+
 library(rsconnect)
 library(shiny)
 library(data.table)
@@ -24,4 +26,4 @@ library(purrr)
 library(rbenchmark)
 library(microbenchmark)
 library(renv)
-renv::init()
+
