@@ -5,6 +5,15 @@ sep.dist<-5
 inc.surv<-0.994
 inc.period<-28
 fledge.period<-35
+
+# used to detect first zero in the survival function
+is_zero <- function(x) x == 0
+
+survival<-function(period,prob.surv){
+  rbinom(round(rnorm(1,period,3)),1,prob.surv) %>% detect_index(is_zero)}
+
+
+
 relay.prob<-0.5
 chick.surv<-0.982
 lay.date<-100
