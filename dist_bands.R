@@ -16,7 +16,7 @@ centre<-bind(c1, c2)
 # create 25-100m bands either side of two transects 500m apart
 s1 <- cbind(c((size/2)-350,(size/2)-275,(size/2)-275,(size/2)-350), c(0, 0, size, size))
 s1a <- coords2Polygons(s1, ID = "B")
-s1a
+
 s2 <- cbind(c((size/2)-225, (size/2)-150, (size/2)-150, (size/2)-225), c(0, 0, size, size))
 s2a <- coords2Polygons(s2, ID = "B")
 s3 <- cbind(c((size/2)+150, (size/2)+225, (size/2)+225,(size/2)+150), c(0, 0, size, size))
