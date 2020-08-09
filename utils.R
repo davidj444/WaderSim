@@ -18,18 +18,35 @@ det.centre<-0.9
 det.second<-0.8
 det.third<-0.7
 inc.offset<-0.6
+library(rbenchmark)
 sites<-2
 sims<-10
 
-# used to detect first zero in the survival function
+# plot.ters function plots a distribution of n territories a min distance d apart from each other on a grid x0:x1:y0:y1
+# points that are not min d distance from another will be removed. it will try 3000 times to plot the required 
+# number of territories after which it will give up and return an error. 
+
+plot.ters <- function(n,x0,x1,y0,y1,d,trials = 3000){
+  for(i in 1:trials){
+    t <- cbind(runif(n,x0,x1),runif(n,y0,y1))
+    if(min(dist(t)) >= d) return(t)
+  }
+  return(NA) 
+}
+
+
+# the survival function is used to calculate the date of failure of nest/chicks given a daily survival probability
 is_zero <- function(x) x == 0
 
 survival<-function(period,prob.surv){
   rbinom(round(rnorm(1,period,3)),1,prob.surv) %>% detect_index(is_zero)}
 
-betw<-Vectorize(between)
 
-xx<-function(){
+# ter.outcomes uses the 'plot.ters' and 'survival' function and the parameters specified by the user  
+# to calculate dates for each territory to start displaying, incubating, chicks hatching, fledging,
+# nest predation, chick predation, relay dates. These data are then held in the dataframe 'terx'.
+
+ter.outcomes<-function(){
   terx<-st_as_sf(data.frame(plot.ters(ter.dens,0,2000,0,2000,sep.dist)), coords = c("X1", "X2"))
   terx$disp<-round(rnorm(n=nrow(terx), lay.date, sd = 3))-21
   terx$inc.start<-terx$disp+21
@@ -62,17 +79,20 @@ xx<-function(){
   terx[is.na(terx)] <- 0
   terx
 }
-xx()
 
-####we assume that visit.a needs to include display and incubation, and visit.b needs to include incubation and chicks
+
+
+
+# this vectorises the function between() which is used in the detekt function (below)
+betw<-Vectorize(between)
 
 #count detections at date.a of pairs displaying & incubating
-testfunc<-function(){
+detekt<-function(){
   date.b<-round(runif(1,date.b.start,date.b.end))
   date.a<-round(runif(1,date.a.start,date.a.end))
   terx<-xx()
   
-  detect.a<-dt_case_when(betw(date.a,terx$disp,terx$inc.start)==TRUE & 
+  detekt.a<-dt_case_when(betw(date.a,terx$disp,terx$inc.start)==TRUE & 
                            as.numeric(st_intersects(terx, centre))==1 & rbinom(n=nrow(terx),1,det.centre)==1  |
                            
                            betw(date.a,terx$disp,terx$inc.start)==TRUE &
@@ -91,10 +111,9 @@ testfunc<-function(){
                            as.numeric(st_intersects(terx, third))== 1 & rbinom(n=nrow(terx),1,det.third*inc.offset)==1 ~ 1,  
                          TRUE ~ 0)
   
-  #count detections at date.b of pairs incubationg & with chicks
-   
+  #it is assumed that at date.b all pairs are either incubating or with chicks
   
-  detect.b<-dt_case_when(betw(date.b,terx$chick.start,terx$chick.end)==TRUE & 
+  detekt.b<-dt_case_when(betw(date.b,terx$chick.start,terx$chick.end)==TRUE & 
                            as.numeric(st_intersects(terx, centre))==1 & rbinom(n=nrow(terx),1,det.centre)==1  |
                            
                            betw(date.b,terx$chick.start,terx$chick.end)==TRUE &
@@ -112,9 +131,9 @@ testfunc<-function(){
                            betw(date.b,terx$inc.start,terx$inc.end)==TRUE &  
                            as.numeric(st_intersects(terx, third))== 1 & rbinom(n=nrow(terx),1,det.third*inc.offset)==1 ~ 1,  
                          TRUE ~ 0)
-  detect.b[is.na(detect.b)]<-0
-  detect.a[is.na(detect.a)]<-0
-  sums<-data.frame(sum(detect.a))
+  detekt.b[is.na(detekt.b)]<-0
+  detekt.a[is.na(detekt.a)]<-0
+  sums<-data.frame(sum(detekt.a))
   sums$x<-sum(detect.b)
   sums$y<-sum(terx$chick.success)
   sums$z<-(n=nrow(terx))
@@ -123,7 +142,7 @@ testfunc<-function(){
 }
 
 simulate<-function(){
-  res <- ldply(1:sites, function(i) data.table(iteration = i, testfunc()))
+  res <- ldply(1:sites, function(i) data.table(iteration = i, detekt()))
   actual.prod<-sum(res$y)/sum(res$z)
   est.prod<-sum(res$x)/sum(res$w)
   output<-cbind(actual.prod,est.prod)

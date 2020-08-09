@@ -14,27 +14,40 @@ renderInputs <- function(prefix) {
                    sliderInput(paste0(prefix, "_", "chick.surv"), "Daily chick survival rate", step = 0.001, value = 0.990, min = 0.85, max = 1),
                    sliderInput(paste0(prefix, "_", "relay.prob"), "probability of relay following nest failure", value = 0.5, min = 0, max = 1),
                    sliderInput(paste0(prefix, "_", "ter.dens"), "Density of territories per sq/km", value = 5, min = 0.5, max = 20),
-                   actionButton(paste0(prefix,"_","recalc"), "Update", icon("random")),
-                   numericInput("sims", "Simulate outcomes:", 100, min = 20, max = 2000)
+                   sliderInput(paste0(prefix, "_", "lay.date"), "Mean laying date (day of year)", value = 100, min = 50, max = 150)
+                   
             ),
             column(6,
                    sliderInput(paste0(prefix, "_", "band1"), "Detectability within 25m of observer", step = 0.05, value = 0.9, min = 0, max = 1),
                    sliderInput(paste0(prefix, "_", "band2"), "Detectability 25-100m of observer", step = 0.05, value = 0.8, min = 0, max = 1),
                    sliderInput(paste0(prefix, "_", "band3"), "Detectability 100-250m of observer", step = 0.05, value = 0.7, min = 0, max = 1),
-                   sliderInput(paste0(prefix, "_", "sep.dist"), "Min. distance between territories (m)", value = 30, min = 0, max = 250)
+                   sliderInput(paste0(prefix, "_", "sep.dist"), "Min. distance between territories (m)", value = 30, min = 0, max = 250),
+                   sliderInput(paste0(prefix, "_", "chick.move"), "Mean daily movement of groups with chicks (m)", value = 30, min = 0, max = 250)
             )
         ))
 }
 
+renderInputsB <- function(prefix) {
+    wellPanel(
+        fluidRow(
+            column(3,
+                   "Specify survey design",
+                   sliderInput(paste0(prefix, "_", "sites"), "How many sites will you survey:", min = 1, max = 80, value = 10),
+                   radioButtons(paste0(prefix, "_", "method"), label = "Select survey method", c("Parallel transects (500m apart)" = "tran","Area search" = "search")),
+            ))
+            
+        )
+}
 
 # Define UI
 ui<- navbarPage(title = "WaderSim 1.0.1",
-                tabPanel("How it works",
+                tabPanel("About",
                          tags$h2("WaderSim: a tool for simulating the effectiveness of different survey designs"),
                          p("Find out more about this tool",
                            tags$a(href="http://www.conservationecology.org/david-jarrett.html", "here.")),
-                         "WaderSim is designed to help at the planning stage of projects designed to gather data on the productivity of breeding waders. It can be used to compare the effectiveness of different survey designs, and to assess the statistical power of different approaches."),
-                tabPanel("Species parameters",
+"WaderSim is a tool to be used at the planning stage of breeing wader productivity projects. You can use WaderSim to investigate how survey design, survey timing and species traits can influence the  
+the effectiveness of productivity estimates."),
+                tabPanel("Specify parameters",
                          
                          fluidPage(theme="simplex.min.css",
                                    tags$style(type="text/css",
@@ -44,8 +57,8 @@ ui<- navbarPage(title = "WaderSim 1.0.1",
                                    
                                    
                                    fluidRow(
-                                       column(6, tags$h3("Species A parameters")),
-                                       column(6, tags$h3("Species B parameters"))
+                                       column(6, tags$h3("Species parameters A")),
+                                       column(6, tags$h3("Species parameters B"))
                                    ),
                                    fluidRow(
                                        column(6, renderInputs("a")),
@@ -65,20 +78,27 @@ ui<- navbarPage(title = "WaderSim 1.0.1",
                                        )
                                    ))),
                 
-                tabPanel("Survey design","Survey design",
+                tabPanel("Example plots",
                          wellPanel(
-                             fluidRow(
-                                 column(3,
-                                        radioButtons(inputId = "method",label = "Select survey method", c("Parallel transects (500m apart)" = "tran","Area search" = "search"))),
-                                 column(3,
-                                        sliderInput("sites", "How many sites will you survey (max 100):", min = 1, max = 80, value = 10)),
-                                 column(3,
-                                        sliderInput("n_sim", "Number of simulations:", min = 1, max = 200, value = 20)),
-                                 column(3,
-                                        actionButton("recalc", "Run simulation", icon("random")))
-                             ))
-                         
-                         
+                                        
+                                 
+                                 
+                             )),
+                
+                tabPanel("Simulate",
+                "Here there will be a button that says number of sims to run:
+                There will be two panels at the top showing the comparison between est. productivity
+                and actual productivity in the two situations.
+                
+                Then a 'run comparison' button parameter set 'A' and parameter set 'B' which plots the
+                estimates from parameter set A / B and ",
+                        
+numericInput("sims", "Simulate outcomes:", 100, min = 20, max = 2000),
+
+       actionButton("recalc", "Run simulation", icon("random")),
+                
+                tabPanel("Code",
+                         "there will be an rmarkdown file here")
                 ))
 
 # server
