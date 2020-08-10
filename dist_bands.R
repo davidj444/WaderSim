@@ -1,5 +1,5 @@
 
-# This creates the distance bands used in the app
+# This creates the distance bands used in the transects approach
 
 # this specifies the length of the transects in metres. 2000 is a good idea. This may be made reactable.
 size<-2000

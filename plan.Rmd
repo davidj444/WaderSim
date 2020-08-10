@@ -11,9 +11,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-I need to edit all the functions in utils.r into one function call which has all the parameters in, and produces the data that I would need to run a GLM with two treatments on each simulation, and put in the plots comparing actual productivity with estimated productivity.
+There also needs to be a mean laying date.
+
+Distance birds move with chicks also important.
+
+mean dist moved in a day with chicks:
+
 
 Then I need to change the plots that are underneath the page where you set parameters.
+
+I need to edit all the functions in utils.r into one function call which has all the parameters in, and produces the data that I would need to run a GLM with two treatments on each simulation, and put in the plots comparing actual productivity with estimated productivity.
 
 ```{r cars}
 summary(cars)

@@ -1,105 +1,62 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-#
-#
-
-# 
-renderInputs <- function(prefix) {
-    wellPanel(
-        fluidRow(
-            column(6,
-                   sliderInput(paste0(prefix, "_", "inc.surv"), "Daily incubation survival rate",step = 0.001, value = 0.990, min = 0.85, max = 1),
-                   sliderInput(paste0(prefix, "_", "chick.surv"), "Daily chick survival rate", step = 0.001, value = 0.990, min = 0.85, max = 1),
-                   sliderInput(paste0(prefix, "_", "relay.prob"), "probability of relay following nest failure", value = 0.5, min = 0, max = 1),
-                   sliderInput(paste0(prefix, "_", "ter.dens"), "Density of territories per sq/km", value = 5, min = 0.5, max = 20),
-                   sliderInput(paste0(prefix, "_", "lay.date"), "Mean laying date (day of year)", value = 100, min = 50, max = 150)
-                   
-            ),
-            column(6,
-                   sliderInput(paste0(prefix, "_", "band1"), "Detectability within 25m of observer", step = 0.05, value = 0.9, min = 0, max = 1),
-                   sliderInput(paste0(prefix, "_", "band2"), "Detectability 25-100m of observer", step = 0.05, value = 0.8, min = 0, max = 1),
-                   sliderInput(paste0(prefix, "_", "band3"), "Detectability 100-250m of observer", step = 0.05, value = 0.7, min = 0, max = 1),
-                   sliderInput(paste0(prefix, "_", "sep.dist"), "Min. distance between territories (m)", value = 30, min = 0, max = 250),
-                   sliderInput(paste0(prefix, "_", "chick.move"), "Mean daily movement of groups with chicks (m)", value = 30, min = 0, max = 250)
-            )
-        ))
-}
-
-renderInputsB <- function(prefix) {
-    wellPanel(
-        fluidRow(
-            column(3,
-                   "Specify survey design",
-                   sliderInput(paste0(prefix, "_", "sites"), "How many sites will you survey:", min = 1, max = 80, value = 10),
-                   radioButtons(paste0(prefix, "_", "method"), label = "Select survey method", c("Parallel transects (500m apart)" = "tran","Area search" = "search")),
-            ))
-            
-        )
-}
-
 # Define UI
-ui<- navbarPage(title = "WaderSim 1.0.1",
+ui <- navbarPage(title = "WaderSim 1.0.1",
                 tabPanel("About",
                          tags$h2("WaderSim: a tool for simulating the effectiveness of different survey designs"),
-                         p("Find out more about this tool",
-                           tags$a(href="http://www.conservationecology.org/david-jarrett.html", "here.")),
-"WaderSim is a tool to be used at the planning stage of breeing wader productivity projects. You can use WaderSim to investigate how survey design, survey timing and species traits can influence the  
-the effectiveness of productivity estimates."),
-                tabPanel("Specify parameters",
                          
-                         fluidPage(theme="simplex.min.css",
-                                   tags$style(type="text/css",
-                                              "label {font-size: 12px;}",
-                                              ".recalculating {opacity: 1.0;}"
-                                   ),
-                                   
-                                   
-                                   fluidRow(
-                                       column(6, tags$h3("Species parameters A")),
-                                       column(6, tags$h3("Species parameters B"))
-                                   ),
-                                   fluidRow(
-                                       column(6, renderInputs("a")),
-                                       column(6, renderInputs("b"))
-                                   ),
-                                   fluidRow(
-                                       column(6,
-                                              "Example simulation in a 4km2 study site.
-                    Productive territories = 75%",
-                                              plotOutput("a_distPlot")
-                                              
-                                       ),
-                                       column(6,
-                                              "Example simulation in a 4km2 study site.
-                   Productive territories = 58%",
-                                              plotOutput("b_distPlot")
-                                       )
-                                   ))),
+                         p("Find out more about this tool",
+                           
+                           tags$a(href="http://www.conservationecology.org/david-jarrett.html", "here.")),
+
+"WaderSim is a tool to be used at the planning stage of breeing wader productivity projects.
+You can use WaderSim to investigate how survey design, 
+survey timing and species traits can influence the  
+the effectiveness of productivity estimates."),
                 
+tabPanel("Specify parameters",
+         fluidPage(theme="simplex.min.css",
+                   tags$style(type="text/css",
+                              "label {font-size: 12px;}",
+                              ".recalculating {opacity: 1.0;}")),
+         
+         fluidRow(
+             column(6, tags$h3("Species parameters A")),
+             column(6, tags$h3("Species parameters B"))),
+         
+         fluidRow(
+             column(6, renderInputs("a")),
+             column(6, renderInputs("b"))),
+         
+         
+         fluidRow(
+             column(6, renderInputsB("a")),
+             column(6, renderInputsB("b")))
+),       
                 tabPanel("Example plots",
                          wellPanel(
-                                        
+                             column(6,
+                             plotOutput("a_distPlot")),
+                             column(6,          
+                             plotOutput("b_distPlot")
                                  
-                                 
-                             )),
+                             ))),
                 
                 tabPanel("Simulate",
-                "Here there will be a button that says number of sims to run:
-                There will be two panels at the top showing the comparison between est. productivity
-                and actual productivity in the two situations.
+"Here there will be a button that says number of sims to run:
+There will be two panels at the top showing the comparison between est. productivity
+and actual productivity in the two situations.
                 
-                Then a 'run comparison' button parameter set 'A' and parameter set 'B' which plots the
-                estimates from parameter set A / B and ",
+Then a 'run comparison' button parameter set 'A' and parameter set 'B' which plots the
+estimates from parameter set A / B and ",
                         
 numericInput("sims", "Simulate outcomes:", 100, min = 20, max = 2000),
 
-       actionButton("recalc", "Run simulation", icon("random")),
+       actionButton("recalc", "Run simulation", icon("random"))
+),
                 
                 tabPanel("Code",
-                         "there will be an rmarkdown file here")
-                ))
+                         "there will be an rmarkdown file here"
+                         )
+                )
 
 # server
 
