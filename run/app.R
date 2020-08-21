@@ -2,7 +2,6 @@
 ui <- navbarPage(title = "WaderSim 1.0.1",
                 tabPanel("About",
                          tags$h2("WaderSim: a tool for simulating the effectiveness of different survey designs"),
-                         
                          p("Find out more about this tool",
                            
                            tags$a(href="http://www.conservationecology.org/david-jarrett.html", "here.")),
@@ -26,19 +25,17 @@ tabPanel("Specify parameters",
              column(6, renderInputs("a")),
              column(6, renderInputs("b"))),
          
-         
          fluidRow(
              column(6, renderInputsB("a")),
-             column(6, renderInputsB("b")))
-),       
+             column(6, renderInputsB("b")))),  
+
                 tabPanel("Example plots",
                          wellPanel(
                              column(6,
                              plotOutput("a_distPlot")),
                              column(6,          
-                             plotOutput("b_distPlot")
-                                 
-                             ))),
+                             plotOutput("b_distPlot")))    
+                         ),
                 
                 tabPanel("Simulate",
 "Here there will be a button that says number of sims to run:
@@ -93,7 +90,7 @@ server<-function(input, output, session){
             coord_sf(xlim = c(0, 2000), ylim = c(0, 2000))
         p1+facet_wrap(~week)+ scale_color_manual(labels = c("Attempt abandoned","Chicks","Display","Nest failed","Fledged","Incubate"), values = c("c" = "#339900", "d" = "blue", "f"= "red","fl"="black","i"="green","a"="grey82"))+theme_minimal()
     }) 
-    
+
 }
 
 # run the application

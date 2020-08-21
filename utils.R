@@ -19,12 +19,26 @@ det.second<-0.8
 det.third<-0.7
 inc.offset<-0.6
 library(rbenchmark)
-sites<-2
+sites<-5
 sims<-10
 
 # plot.ters function plots a distribution of n territories a min distance d apart from each other on a grid x0:x1:y0:y1
 # points that are not min d distance from another will be removed. it will try 3000 times to plot the required 
 # number of territories after which it will give up and return an error. 
+
+#the way to resolve the two different size areas
+#is to have simA() and simB() simulation functions, and the survey design
+#radiobutton selects which one is called...
+#so all the code has to be written out twice, esentially
+#gives the ggplot output produced below, and also a GLM
+
+#function for choosing survey design plottype
+plotType <- function(type) {
+  switch(type,
+         search = area_search,
+         tran = transects)
+}
+
 
 plot.ters <- function(n,x0,x1,y0,y1,d,trials = 3000){
   for(i in 1:trials){
@@ -90,7 +104,7 @@ betw<-Vectorize(between)
 detekt<-function(){
   date.b<-round(runif(1,date.b.start,date.b.end))
   date.a<-round(runif(1,date.a.start,date.a.end))
-  terx<-xx()
+  terx<-ter.outcomes()
   
   detekt.a<-dt_case_when(betw(date.a,terx$disp,terx$inc.start)==TRUE & 
                            as.numeric(st_intersects(terx, centre))==1 & rbinom(n=nrow(terx),1,det.centre)==1  |
@@ -134,21 +148,59 @@ detekt<-function(){
   detekt.b[is.na(detekt.b)]<-0
   detekt.a[is.na(detekt.a)]<-0
   sums<-data.frame(sum(detekt.a))
-  sums$x<-sum(detect.b)
-  sums$y<-sum(terx$chick.success)
-  sums$z<-(n=nrow(terx))
-  names(sums)[1]<-"w"
+  sums$late.det<-sum(detekt.b)
+  sums$suc.ters<-sum(terx$chick.success)
+  sums$tot.ters<-(n=nrow(terx))
+  names(sums)[1]<-"early.det"
   sums
 }
 
+###this takes the detection function detekt() and runs it for however many sites you have surveyed
+###it compares est.prod to actual.prod
 simulate<-function(){
   res <- ldply(1:sites, function(i) data.table(iteration = i, detekt()))
-  actual.prod<-sum(res$y)/sum(res$z)
-  est.prod<-sum(res$x)/sum(res$w)
+  actual.prod<-sum(res$suc.ters)/sum(res$tot.ters)
+  est.prod<-sum(res$late.det)/sum(res$early.det)
   output<-cbind(actual.prod,est.prod)
   output
 }
 
+###this produces the output graph which compares actual.prod to est.prod
 res1<-gather(ldply(1:sims, function(i) data.table(iteration = i, simulate())), iteration)
 ggplot(res1, aes(value, fill = iteration)) + geom_density(alpha = 0.2) +
   xlim(0,1)
+res1
+
+###this function produces sums of the estimated productivity
+surv.prod<-function(){
+res <- ldply(1:sites, function(i) tibble(iteration = i, detekt()))
+r<-data.frame(sum(res$late.det),(sum(res$early.det)))
+names(r)[[1]]<-"k"
+names(r)[[2]]<-"n"
+r
+}
+
+###
+moddat<-function(){
+mod.data<-ldply(1:sims, function(i) tibble(iteration = i, surv.prod()))
+mod.data$set<-c("A","B")
+mod.data
+}
+
+mod.data2 <- moddat() %>% 
+  group_by(iteration) %>% 
+  nest()
+
+mod.data2
+
+view(mod.data2)
+
+mapmodels<-function(df){
+lm(cbind(df$k,df$n-df$k)~factor(df$set),data = df, family="binomial")}
+
+###this needs to be changed to an independent samples t-test
+###instead of a lm / glm 
+models <- map(mod.data2$data, mapmodels)
+
+
+
