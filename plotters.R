@@ -21,7 +21,7 @@ plot.ters <- function(n,x0,x1,y0,y1,d,trials = 3000){
 }
 
 # plot.tersT is used for the transect survey design
-plot.tersA <- function(n,d,trials = 3000){
+plot.tersT <- function(n,d,trials = 3000){
   for(i in 1:trials){
     t <- cbind(runif(10*n,-500,1500),runif(n,-500,4500))
     if(min(dist(t)) >= d) return(t)
@@ -30,7 +30,7 @@ plot.tersA <- function(n,d,trials = 3000){
 }
 
 # plot.tersA is for the area_search survey design
-plot.tersB <- function(n,d,trials = 3000){
+plot.tersA <- function(n,d,trials = 3000){
   for(i in 1:trials){
     t <- cbind(runif(6*n,-500,1500),runif(n,-500,2500))
     if(min(dist(t)) >= d) return(t)
