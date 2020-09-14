@@ -34,35 +34,31 @@ b<-bind(b1,b2,b3,b4,b5,b6,b7,b8,b9) %>% st_as_sf()
 y.det <- det.second + det.third*(1-det.second)
 b.det <- det.centre + det.third*(1-det.centre)
 
+## specify items to appear in 'transects' example plot - shades of grey for different detectabilities
+## and blue dashed line for survey route
+as.line1<-  geom_segment(aes(x = 100, y = 100, xend = 100, yend = 1900), linetype = "dashed", colour = "blue", size=0.05)
+as.line2<-  geom_segment(aes(x = 300, y = 100, xend = 300, yend = 1900), linetype = "dashed", colour = "blue", size=0.05)
+as.line3<-  geom_segment(aes(x = 500, y = 100, xend = 500, yend = 1900), linetype = "dashed", colour = "blue", size=0.05)
+as.line4<-  geom_segment(aes(x = 700, y = 100, xend = 700, yend = 1900), linetype = "dashed", colour = "blue", size=0.05)
+as.line5<-  geom_segment(aes(x = 900, y = 100, xend = 900, yend = 1900), linetype = "dashed", colour = "blue", size=0.05)
+as.line6<-  geom_segment(aes(x = 100, y = 1900, xend = 300, yend = 1900),linetype = "dashed", colour = "blue", size=0.05)
+as.line7<-  geom_segment(aes(x = 500, y = 1900, xend = 700, yend = 1900),linetype = "dashed", colour = "blue", size=0.05)
+as.line8<-  geom_segment(aes(x = 300, y = 100, xend = 500, yend = 100),  linetype = "dashed", colour = "blue", size=0.05)
+as.line9<-  geom_segment(aes(x = 700, y = 100, xend = 900, yend = 100),  linetype = "dashed", colour = "blue", size=0.05)
+as.labs<-labs(x = "2km", y = "3km") 
+as.scalex<-  scale_x_continuous(limits = c(-500,1500))
+as.scaley<-  scale_y_continuous(limits = c(-500,2500)) 
+as.band1<-  geom_sf(data=b, fill = "darkgray", colour = NA)
+as.band2<-geom_sf(data=y, fill = "grey", colour = NA)
 
 # this makes 'area_search' a ggplot object that can be called e.g. in RShiny
 area_search <-
+  ggplot() +as.band1 +as.band2 +
+  as.line1 + as.line2 + as.line3 + as.line4 + as.line5 + as.line6 + as.line7 + as.line8 + as.line9 +
+  as.scalex + as.scaley  + mytheme + arrow + as.labs
   
-  ggplot() +
-  
-  # plot the areas with different detectability in different shades
-  geom_sf(data=b, fill = "darkgrey", colour = NA) +
-  geom_sf(data=y, fill = "grey", colour = NA) +
-  
-  # plot the (hypothesised) survey route
-  geom_segment(aes(x = 100, y = 100, xend = 100, yend = 1900), linetype = "dashed", colour = "blue", size=0.05) +
-  geom_segment(aes(x = 300, y = 100, xend = 300, yend = 1900), linetype = "dashed", colour = "blue", size=0.05) +
-  geom_segment(aes(x = 500, y = 100, xend = 500, yend = 1900), linetype = "dashed", colour = "blue", size=0.05) +
-  geom_segment(aes(x = 700, y = 100, xend = 700, yend = 1900), linetype = "dashed", colour = "blue", size=0.05) +
-  geom_segment(aes(x = 900, y = 100, xend = 900, yend = 1900), linetype = "dashed", colour = "blue", size=0.05) +
-  geom_segment(aes(x = 100, y = 1900, xend = 300, yend = 1900),linetype = "dashed", colour = "blue", size=0.05) +
-  geom_segment(aes(x = 500, y = 1900, xend = 700, yend = 1900),linetype = "dashed", colour = "blue", size=0.05) +
-  geom_segment(aes(x = 300, y = 100, xend = 500, yend = 100),  linetype = "dashed", colour = "blue", size=0.05) +
-  geom_segment(aes(x = 700, y = 100, xend = 900, yend = 100),  linetype = "dashed", colour = "blue", size=0.05) +
-  
-  # change the axes, size of the plot and theme
-  scale_x_continuous(limits = c(-500,1500), breaks = c(-500,0,500,1000,1500)) +
-  scale_y_continuous(limits = c(-500,2500), breaks = c(-500,0,500,1000,1500,2000,2500)) +
-  theme_minimal()
-
-# view plot
 area_search
 
-
+ggplot()+arrow
 
 

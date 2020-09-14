@@ -4,9 +4,9 @@ plotType <- function(type) {
          tran = transects)
 }
 
-ui <- 
-  wellPanel(
-    fluidRow(
+ui <- fluidPage(
+wellPanel(
+fluidRow(
   column(6, 
          radioButtons("a_method", "Survey method",
                c("Area search" = "search",
@@ -14,10 +14,13 @@ ui <-
          column(6,
                 radioButtons("b_method", "Survey method",
                c("Area search" = "search",
-                 "transects" = "tran")))),
-  fluidRow(
-    column(3, plotOutput('a_design')),
-    column(3, plotOutput('b_design'))))
+                 "transects" = "tran"))))),
+wellPanel("main panel",
+          fluidRow(
+            splitLayout(cellWidths = c("50%", "50%"), plotOutput("a_design"), plotOutput("b_design"))
+          )))
+          
+
 
 server = function(input, output) {
   output$a_design <- renderPlot({ 
@@ -28,6 +31,5 @@ server = function(input, output) {
 }
 
 shinyApp(ui, server)
-
 
 
