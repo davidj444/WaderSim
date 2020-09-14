@@ -37,7 +37,3 @@ plot.tersA <- function(n,d,trials = 3000){
   }
   return(NA) 
 }
-
-# test code, generate 
-plot.tersT(6,20)
-plot.tersA(6,20)
